@@ -20,8 +20,9 @@ public class PdfHandler {
             return;
         }
 
-        try (PDDocument document = PDDocument.load(file)) {
+        try  {
 
+            PDDocument document = PDDocument.load(file);
             PDFTextStripper pdfStripper = new PDFTextStripper();
 
 
