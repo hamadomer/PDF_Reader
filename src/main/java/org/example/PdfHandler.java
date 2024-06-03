@@ -4,6 +4,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,15 +13,12 @@ import java.util.Map;
 public class PdfHandler {
 
     public void pdfToString ( String path ) {
-        String filePath = path;
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            System.out.println("The specified file does not exist.");
-            return;
-        }
-
-        try  {
+       try{
+           String filePath = path;
+           File file = new File(filePath);
+           if (!file.exists()) {
+               throw new IOException();
+           }
 
             PDDocument document = PDDocument.load(file);
             PDFTextStripper pdfStripper = new PDFTextStripper();
@@ -39,10 +37,9 @@ public class PdfHandler {
             if(dataMap.get("Title").equals("Demande de paiement de facture")) {
                 System.out.println("Demande de paiement de la facture " + dataMap.get("Facture") + ", pour un montant de " + dataMap.get("Montant") + ", émise le " + dataMap.get("Date"));
             }
-
-        } catch (IOException e) {
-            System.err.println("An error occurred while trying to read the PDF file: " + e.getMessage());
-        }
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
     }
 
     private static Map<String, String> parseTextToMap(String text) {
