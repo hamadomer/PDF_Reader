@@ -7,7 +7,7 @@ public class PdfHandlerTest {
         @Test
         public void testPdfReturnPreSetSString () {
             PdfHandler pdf = new PdfHandler();
-            assertEquals("Demande de paiement de la facture Hurricane123, pour un montant de 1 000 000 dollars, émise le 30/11/1975", pdf.pdfToString("src\\test\\resources\\exo2_format1.pdf"));
+            assertEquals("Demande de paiement MVP (1 000 000 dollars) via Facturo1999, de la facture Hurricane123", pdf.pdfToString("src\\test\\resources\\exo2_format1.pdf"));
             assertEquals("Acquittement automatique de la facture FACT10293", pdf.pdfToString("src\\test\\resources\\exo2_format2.pdf"));
         }
 }

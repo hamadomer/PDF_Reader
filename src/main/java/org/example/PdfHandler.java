@@ -88,23 +88,21 @@ public class PdfHandler {
 
         switch (fullName) {
             case "Emmanuel Macron":
-                return "Acquittement automatique de la facture émise par le Président de la République française (FACT10293)";
+                return "Acquittement automatique de la facture émise par le Président de la République française (" + dataMap.get("Facture")+")";
             case "Joe Biden":
-                return "Acquittement automatique de la facture émise par le Président des Etats-Unis d'Amérique (FACT10293)";
+                return "Acquittement automatique de la facture émise par le Président des Etats-Unis d'Amérique (" + dataMap.get("Facture")+")";
             case "Elon Musk":
-                return "Acquittement automatique de la facture émise par le Directeur Général de Tesla (FACT10293)";
+                return "Acquittement automatique de la facture émise par le Directeur Général de Tesla (" + dataMap.get("Facture")+")";
             case "Ursula von der Leyen":
-                return "Acquittement automatique de la facture émise par la Présidente de la commission européenne (FACT10293)";
+                return "Acquittement automatique de la facture émise par la Présidente de la commission européenne (" + dataMap.get("Facture")+")";
             default:
                 if (money > 1000) {
-                    return "Acquittement automatique de la facture FACT10293 MVP (" + dataMap.get("Montant") + ")";
+                    return "Acquittement automatique de la facture " + dataMap.get("Facture") + " MVP (" + dataMap.get("Montant") + ")";
                 }
                 break;
         }
 
-        return "Demande de paiement de la facture " + dataMap.get("Facture") +
-                ", pour un montant de " + dataMap.get("Montant") +
-                ", émise le " + dataMap.get("Date");
+        return "Acquittement automatique de la facture " + dataMap.get("Facture") ;
     }
 
     private String handleObjectConditions(Map<String, String> dataMap) {
