@@ -66,10 +66,10 @@ public class PdfHandler {
     }
 
     private String handlePaymentRequest(Map<String, String> dataMap) {
-        String[] dateParts = dataMap.getOrDefault("Date", "").split("/");
+        String[] dateParts = dataMap.get("Date").split("/");
         int year = dateParts.length == 3 ? Integer.parseInt(dateParts[2]) : 0;
 
-        String amountString = extractAmount(dataMap.getOrDefault("Montant", ""));
+        String amountString = extractAmount(dataMap.get("Montant"));
         int money = amountString.isEmpty() ? 0 : Integer.parseInt(amountString.replace(" ", ""));
 
         if (money > 1000 && year < 2000) {
@@ -106,7 +106,7 @@ public class PdfHandler {
     }
 
     private String handleObjectConditions(Map<String, String> dataMap) {
-        String object = dataMap.getOrDefault("Objet", "");
+        String object = dataMap.get("Objet",);
 
         if (object.contains("Donuts") && object.contains("Tacos")) {
             return "Commande Donuts & Tacos (" + dataMap.get("Facture") + ")";
