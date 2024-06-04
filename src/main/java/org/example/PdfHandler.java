@@ -1,8 +1,8 @@
 package org.example;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class PdfHandler {
 
-    public void pdfToString ( String path ) {
+    public String pdfToString ( String path ) {
        try{
            String filePath = path;
            File file = new File(filePath);
@@ -20,7 +20,7 @@ public class PdfHandler {
                throw new IOException();
            }
 
-            PDDocument document = PDDocument.load(file);
+            PDDocument document = Loader.loadPDF(file);
             PDFTextStripper pdfStripper = new PDFTextStripper();
 
 
@@ -33,13 +33,16 @@ public class PdfHandler {
 
             if(dataMap.get("Title").equals("Acquittement de facture")) {
                 System.out.println("Acquittement automatique de la facture " + dataMap.get("Facture"));
+                return "Acquittement automatique de la facture " + dataMap.get("Facture");
             }
             if(dataMap.get("Title").equals("Demande de paiement de facture")) {
                 System.out.println("Demande de paiement de la facture " + dataMap.get("Facture") + ", pour un montant de " + dataMap.get("Montant") + ", émise le " + dataMap.get("Date"));
+                return "Demande de paiement de la facture " + dataMap.get("Facture") + ", pour un montant de " + dataMap.get("Montant") + ", émise le " + dataMap.get("Date");
             }
        } catch (IOException e) {
            e.printStackTrace();
        }
+        return "faild";
     }
 
     private static Map<String, String> parseTextToMap(String text) {
