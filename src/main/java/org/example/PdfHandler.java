@@ -21,16 +21,13 @@ public class PdfHandler {
     private static final String DEFAULT_RESPONSE = "No matched data has been found";
 
     public String pdfToString(String path) {
-        try {
-            File file = new File(path);
-            if (!file.exists()) {
-                throw new IOException("File does not exist");
-            }
-
-            PDDocument document = Loader.loadPDF(file);
+        File file = new File(path);
+        if (!file.exists()) {
+            return "File does not exist";
+        }
+        try (PDDocument document = Loader.loadPDF(file)) {
             PDFTextStripper pdfStripper = new PDFTextStripper();
             String text = pdfStripper.getText(document);
-            document.close();
 
             Map<String, String> dataMap = parseTextToMap(text);
 
@@ -41,6 +38,7 @@ public class PdfHandler {
             return DEFAULT_RESPONSE;
         }
     }
+
 
     private static Map<String, String> parseTextToMap(String text) {
         Map<String, String> dataMap = new HashMap<>();
