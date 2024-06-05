@@ -131,7 +131,7 @@ public class PdfHandler {
         return "";
     }
 
-    public void createPdf() {
+    public void dataToPdf(Data data, String path) {
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage());
 
@@ -140,13 +140,13 @@ public class PdfHandler {
             addText.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN), 12);
             addText.newLineAtOffset(25, 500);
 
-            String titleText = "Acquittement de facture";
-            String nomText = "Nom : Macron";
-            String prenomText = "Prénom : Emmanuel";
-            String factureText = "Facture : ShowFacture123";
-            String dateText = "Date : 06/05/2013";
-            String objetText = "Objet : Donuts and Tacos";
-            String priceText = "Montant : 1001 dollars";
+            String titleText = data.getTitle();
+            String nomText = "Nom : " + data.getNom();
+            String prenomText = "Prénom : " + data.getPrenom();
+            String factureText = "Facture : " + data.getFacture();
+            String dateText = "Date : " + data.getDate();
+            String objetText = "Objet : " + data.getObjet();
+            String priceText = "Montant : " + data.getMontant();
 
 
             // Adding text in the form of string
@@ -180,7 +180,7 @@ public class PdfHandler {
             // Ending the content stream
             addText.endText();
             addText.close();
-            document.save("src\\main\\resources\\exo2_format3.pdf");
+            document.save(path);
             System.out.println("Content added");
         } catch (IOException e) {
             throw new RuntimeException(e);
