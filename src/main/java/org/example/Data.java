@@ -13,6 +13,18 @@ public class Data {
     private String montant;
     private Map<String, String> dataObject;
 
+    public Data(String title, String nom, String prenom, String facture, String date, String objet, String montant) {
+        this.title = title;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.facture = facture;
+        this.date = date;
+        this.objet = objet;
+        this.montant = montant;
+        this.dataObject = new HashMap<>();
+        addValuesToMap();
+    }
+
     public String getTitle() {
         return title;
     }
@@ -39,18 +51,6 @@ public class Data {
 
     public String getMontant() {
         return montant;
-    }
-
-    public Data(String title, String nom, String prenom, String facture, String date, String objet, String montant) {
-        this.title = title;
-        this.nom = nom;
-        this.prenom = prenom;
-        this.facture = facture;
-        this.date = date;
-        this.objet = objet;
-        this.montant = montant;
-        this.dataObject = new HashMap<>();
-        addValuesToMap();
     }
 
     private void addValuesToMap() {
