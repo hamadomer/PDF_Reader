@@ -9,6 +9,9 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 
@@ -20,9 +23,8 @@ public class PdfHandler {
     public String pdfToString(String path) throws IOException {
         File file = new File(path);
         if (!file.exists()) {
-            throw  new IOException("Path not found : " + path);
+            throw new IOException("Path not found : " + path);
         }
-
 
 
         try (PDDocument document = Loader.loadPDF(file)) {
@@ -39,8 +41,7 @@ public class PdfHandler {
     }
 
 
-
-    public void dataToPdf(Data data, String path) {
+    public void dataToPdf(Data data, String path) throws IOException {
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage());
 
@@ -89,9 +90,19 @@ public class PdfHandler {
             // Ending the content stream
             addText.endText();
             addText.close();
-            document.save(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                if (Files.exists(Path.of(path))) {
+                    throw new FileAlreadyExistsException("File already exists: " + path);
+                } else {
+                    document.save(path);
+                    System.out.println("Document saved successfully.");
+                }
+            } catch (FileAlreadyExistsException e) {
+                System.out.println(e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("An error occurred while saving the document.");
+            }
         }
     }
 }

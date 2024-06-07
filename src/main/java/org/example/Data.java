@@ -24,6 +24,9 @@ public class Data {
         this.dataObject = new HashMap<>();
         addValuesToMap();
     }
+    public Data() {
+
+    }
 
     public String getTitle() {
         return title;
@@ -51,6 +54,34 @@ public class Data {
 
     public String getMontant() {
         return montant;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public void setFacture(String facture) {
+        this.facture = facture;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setMontant(String montant) {
+        this.montant = montant;
+    }
+
+    public void setObjet(String objet) {
+        this.objet = objet;
     }
 
     private void addValuesToMap() {
