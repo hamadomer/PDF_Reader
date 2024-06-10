@@ -12,13 +12,14 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 
 
 public class PdfHandler {
 
-    ObjectMethods object = new ObjectMethods();
+    DataController object = new DataController();
 
     public String pdfToString(String path) throws IOException {
         File file = new File(path);
@@ -38,6 +39,34 @@ public class PdfHandler {
         }
 
 
+    }
+
+    public Data pdfToData(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new IOException("Path not found: " + path);
+        }
+
+        try (PDDocument document = Loader.loadPDF(file)) {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            String text = pdfStripper.getText(document);
+
+            String[] lines = text.split("\n");
+            Map<String, String> values = new HashMap<>();
+
+            for (int i =  0; i < lines.length; i++) {
+               if(i == 0) {
+                   values.put("Title", lines[i].trim());
+               } else {
+                   String[] keyValue = lines[i].split(":");
+                   if (keyValue.length == 2) {
+                       values.put(keyValue[0].trim(), keyValue[1].trim());
+                   }
+               }
+            }
+
+            return new Data(values.get("Title"), values.get("Nom"), values.get("Prénom"), values.get("Facture"), values.get("Date"), values.get("Objet"), values.get("Montant"));
+        }
     }
 
 

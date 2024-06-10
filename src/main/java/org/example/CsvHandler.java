@@ -1,8 +1,10 @@
 package org.example;
 
 import com.opencsv.CSVReaderHeaderAware;
+import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,13 +21,13 @@ public class CsvHandler {
 
             Map<String, String> values;
             while ((values = csvReader.readMap()) != null) {
-                String type;
-                if ("paiement".equals(values.get("type"))) {
-                    type = "Demande de paiement de facture";
+                String Title;
+                if ("paiement".equals(values.get("Title"))) {
+                    Title = "Demande de paiement de facture";
                 } else {
-                    type = "Acquittement de facture";
+                    Title = "Acquittement de facture";
                 }
-                dataList.add(new Data(type, values.get("nom"), values.get("prenom"), values.get("numero"), values.get("date"), values.get("objet"), values.get("montant")));
+                dataList.add(new Data(Title, values.get("nom"), values.get("prenom"), values.get("numero"), values.get("date"), values.get("objet"), values.get("montant")));
             }
         }
 
@@ -35,5 +37,16 @@ public class CsvHandler {
             return new Data("empty", "empty", "empty", "empty", "empty", "empty", "empty");
         }
     }
+
+    public void dataToCsv(Data data, String path) throws IOException {
+        try (FileWriter outputfile = new FileWriter(path)) {
+            CSVWriter writer = new CSVWriter(outputfile);
+            String[] header = {"Title", "Nom", "Prénom", "Facture", "Date", "Objet", "Montant"};
+            writer.writeNext(header);
+            String[] info = {data.getTitle(), data.getNom(), data.getPrenom(), data.getFacture(), data.getDate(), data.getObjet(), data.getMontant()};
+            writer.writeNext(info);
+        }
     }
+
+}
 
