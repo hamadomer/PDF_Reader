@@ -115,7 +115,7 @@ public class DataController {
         File[] files = directory.listFiles();
 
         if (files != null) {
-            try (FileWriter outputfile = new FileWriter("src/main/output/output.csv");
+            try (FileWriter outputfile = new FileWriter("src/test/resources/ReadFileTest/output.csv");
                  CSVWriter writer = new CSVWriter(outputfile)) {
 
                 String[] header = {"numero", "description"};
