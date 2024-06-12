@@ -276,3 +276,5 @@ src\main\resources\test3.pdf;This Document doesn't have a valid facture
 src\main\resources\test4.csv;empty Csv file
 src\main\resources\testCsv.csv;Type of facture isn't supported
 src\main\resources\testCsv.csv;Type of facture isn't supported
+src\test\resources\ReadFileTest\testCsv.csv;Type of facture isn't supported
+src\test\resources\ReadFileTest\testCsv.csv;Type of facture isn't supported
