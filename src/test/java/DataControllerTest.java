@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -32,11 +33,17 @@ public class DataControllerTest {
     }
 
     @Test
-    public void testReadFileAndCreateDataWithWorkingData () throws CsvValidationException, IOException {
+    public void testReadFileAndCreateDataWithWorkingData() throws CsvValidationException, IOException {
+        Path outputPath = Paths.get("src/test/resources/ReadFileTest/output.csv");
+        if (Files.exists(outputPath)) {
+            Files.delete(outputPath);
+        }
+
         DataController returnSome = new DataController();
         returnSome.readFileAndCreateData("src/test/resources/ReadFileTest/");
 
-        List<String> lines = Files.readAllLines(Paths.get("src/test/resources/ReadFileTest/output.csv"));
+
+        List<String> lines = Files.readAllLines(outputPath);
         lines.toArray(new String[0]);
         assertEquals("\"numero\",\"description\"", lines.get(0));
         assertEquals("\"Hurricane123\",\"Demande de paiement MVP (1 000 000 dollars) via Facturo1999, de la facture Hurricane123\"", lines.get(1));

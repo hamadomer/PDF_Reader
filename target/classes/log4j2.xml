@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <File name="ErrorFile" fileName="logs/errors.csv" append="true">
+            <PatternLayout pattern="%msg%n" />
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="PDFErrorLogger" level="error" additivity="false">
+            <AppenderRef ref="ErrorFile" />
+        </Logger>
+        <Root level="error">
+            <AppenderRef ref="ErrorFile" />
+        </Root>
+    </Loggers>
+</Configuration>

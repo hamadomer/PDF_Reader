@@ -1,5 +1,7 @@
 package org.example;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -7,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -16,8 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 public class PdfHandler {
+
+
 
     DataController object = new DataController();
 
@@ -40,35 +44,6 @@ public class PdfHandler {
 
 
     }
-
-    public Data pdfToData(String path) throws IOException {
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new IOException("Path not found: " + path);
-        }
-
-        try (PDDocument document = Loader.loadPDF(file)) {
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            String text = pdfStripper.getText(document);
-
-            String[] lines = text.split("\n");
-            Map<String, String> values = new HashMap<>();
-
-            for (int i =  0; i < lines.length; i++) {
-               if(i == 0) {
-                   values.put("Title", lines[i].trim());
-               } else {
-                   String[] keyValue = lines[i].split(":");
-                   if (keyValue.length == 2) {
-                       values.put(keyValue[0].trim(), keyValue[1].trim());
-                   }
-               }
-            }
-
-            return new Data(values.get("Title"), values.get("Nom"), values.get("Prénom"), values.get("Facture"), values.get("Date"), values.get("Objet"), values.get("Montant"));
-        }
-    }
-
 
     public void dataToPdf(Data data, String path) throws IOException {
         try (PDDocument document = new PDDocument()) {

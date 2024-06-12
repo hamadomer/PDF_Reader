@@ -1,18 +1,29 @@
 package org.example;
 
+import com.opencsv.CSVReaderHeaderAware;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DataController {
+
+    private static final Logger logger = LogManager.getLogger("CSVErrorLogger");
+    ArrayList<Data> dataList = new ArrayList<>();
+    Mail mail = new Mail();
+    String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+    String fileName;
+    int scanndDocs = 0;
+    int invaildDocs = 0;
 
     public Map<String, String> parseTextToMap(String text) {
         Map<String, String> dataMap = new HashMap<>();
@@ -20,6 +31,8 @@ public class DataController {
 
         if (lines.length > 0) {
             dataMap.put("Title", lines[0].trim());
+        } else {
+            throw new FormatFlagsConversionMismatchException("File is empty", 'F');
         }
 
         for (String line : lines) {
@@ -112,6 +125,7 @@ public class DataController {
         if (!directory.isDirectory()) {
             throw new FileNotFoundException("No directory found in the path given");
         }
+        fileName = path;
         File[] files = directory.listFiles();
 
         if (files != null) {
@@ -125,22 +139,120 @@ public class DataController {
                     String numero;
                     String description;
 
-                    if (file.isFile() && file.getName().endsWith(".pdf")) {
-                        Data data = pdfReader.pdfToData(file.getPath());
-                        numero = data.getFacture();
-                        description = generateResponse(data.getData());
-                    } else if (file.isFile() && file.getName().endsWith(".csv")) {
-                        Data data = csvReader.csvToData(file.getPath(), 0);
-                        numero = data.getFacture();
-                        description = generateResponse(data.getData());
-                    } else {
-                        continue;
+//                  Data data = pdfReader.pdfToData(file.getPath());
+                    Data data = processDocs(file.getPath());
+                    try {
+                        if(data.getFacture() != null) {
+                            numero = data.getFacture();
+                            description = generateResponse(data.getData());
+                            String[] input = {numero, description};
+                            writer.writeNext(input);
+                        } else {
+                            throw new NullPointerException();
+                        }
+                    } catch ( NullPointerException e) {
+                        String errorMsg = String.format("%s;%s", file.getPath(), "This Document doesn't have a valid facture");
+                        logger.error(errorMsg);
                     }
-
-                    String[] input = {numero, description};
-                    writer.writeNext(input);
                 }
+                mail.setDate(date);
+                mail.setNumberOfInvalidDocs(invaildDocs);
+                mail.setNumberOfScannedDocs(scanndDocs);
+                mail.setFileName(fileName);
+                System.out.println(mail.getSujet() + "\n" + mail.getCorps());
             }
         }
     }
+
+    private Data processDocs(String path) throws IOException {
+
+
+
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new IOException("Path not found: " + path);
+        }
+
+        if (file.isFile()) {
+            if (file.getName().endsWith(".pdf")) {
+                return processPdf(file);
+            } else if (file.getName().endsWith(".csv")) {
+                return processCsv(file);
+            }
+        }
+        String errorMsg = String.format("%s;%s", file.getPath(), "The given path isn't a valid File");
+        logger.error(errorMsg);
+        return null;
+    }
+
+    private Data processPdf(File file) throws IOException {
+        scanndDocs++;
+        try (PDDocument document = Loader.loadPDF(file)) {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            String text = pdfStripper.getText(document);
+            if (text.trim().isEmpty()) {
+                String errorMsg = String.format("%s;%s", file.getPath(), "File is empty");
+                logger.error(errorMsg);
+                invaildDocs++;
+                mail.setNamesOfInvalidDocs(file.getPath());
+            }
+
+            String[] lines = text.split("\n");
+            Map<String, String> values = new HashMap<>();
+            for (int i = 0; i < lines.length; i++) {
+                if (i == 0) {
+                    values.put("Title", lines[i].trim());
+                } else {
+                    String[] keyValue = lines[i].split(":");
+                    if (keyValue.length == 2) {
+                        values.put(keyValue[0].trim(), keyValue[1].trim());
+                    } else {
+                        String errorMsg = String.format("%s;%s", file.getPath(), "The file doesn't respect the key : value format");
+                        logger.error(errorMsg);
+                        invaildDocs++;
+                        mail.setNamesOfInvalidDocs(file.getPath());
+                    }
+                }
+            }
+
+            return new Data(values.get("Title"), values.get("Nom"), values.get("Prénom"), values.get("Facture"), values.get("Date"), values.get("Objet"), values.get("Montant"));
+        }
+    }
+
+    private Data processCsv(File file) {
+        scanndDocs++;
+        try (FileReader fileReader = new FileReader(file); CSVReaderHeaderAware csvReader = new CSVReaderHeaderAware(fileReader)) {
+            List<Data> dataList = new ArrayList<>();
+            Map<String, String> values;
+            while ((values = csvReader.readMap()) != null) {
+                String title;
+                if ("paiement".equals(values.get("Title"))) {
+                    title = "Demande de paiement de facture";
+                } else if ("Acquittement".equals(values.get("Title"))) {
+                    title = "Acquittement de facture";
+                } else {
+                    String errorMsg = String.format("%s;%s", file.getPath(), "Type of facture isn't supported");
+                    logger.error(errorMsg);
+                    title = "empty";
+                    invaildDocs++;
+                    mail.setNamesOfInvalidDocs(file.getPath());
+                }
+                dataList.add(new Data(title, values.get("nom"), values.get("prenom"), values.get("numero"), values.get("date"), values.get("objet"), values.get("montant")));
+            }
+
+            if (!dataList.isEmpty()) {
+                return dataList.get(0); // Assuming you want to return the first item.
+            } else {
+                return new Data("empty", "empty", "empty", "empty", "empty", "empty", "empty");
+            }
+        } catch (IOException | CsvValidationException | NullPointerException e) {
+            String errorMsg = String.format("%s;%s", file.getPath(), "empty Csv file");
+            logger.error(errorMsg);
+            invaildDocs++;
+            mail.setNamesOfInvalidDocs(file.getPath());
+            return new Data("empty", "empty", "empty", "empty", "empty", "empty", "empty");
+        }
+    }
+
+
 }
