@@ -1,11 +1,7 @@
 
-import com.opencsv.exceptions.CsvValidationException;
-import org.example.CsvHandler;
-import org.example.Data;
-import org.example.DataController;
-
-import org.example.PdfHandler;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,8 +10,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.example.DataController;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class DataControllerTest {
 
@@ -41,7 +39,6 @@ public class DataControllerTest {
 
         DataController returnSome = new DataController();
         returnSome.readFileAndCreateData("src/test/resources/ReadFileTest/");
-
 
         List<String> lines = Files.readAllLines(outputPath);
         lines.toArray(new String[0]);
