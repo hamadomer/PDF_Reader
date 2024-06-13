@@ -10,8 +10,16 @@ import org.example.review.model.ReportForOneFile.FactureDescription;
 
 public class GlobalReport {
     
-    private LocalDateTime date = LocalDateTime.now();
-    private List<ReportForOneFile> reports = new ArrayList<>();
+    private final File inputDir;
+    private final LocalDateTime date;
+    private final List<ReportForOneFile> reports;
+    
+    public GlobalReport(File inputDir) {
+        super();
+        this.inputDir = inputDir;
+        this.date = LocalDateTime.now();
+        this.reports = new ArrayList<>();
+    }
 
     public void addAll(List<ReportForOneFile> reports) {
         this.reports.addAll(reports);
@@ -61,4 +69,8 @@ public class GlobalReport {
         return date;
     }
 
+    public File getInputDir() {
+        return inputDir;
+    }
+    
 }

@@ -32,7 +32,7 @@ public class FacturesCalculDescriptionMain {
     
     public void calculerDescriptionsDesFacturesFromDir(Path dir) {
         
-        GlobalReport globalReport = new GlobalReport();
+        GlobalReport globalReport = new GlobalReport(dir.toFile());
         
         File[] files = listFilesInDir(dir);
         List<ReportForOneFile> reports = parseFiles(files);
